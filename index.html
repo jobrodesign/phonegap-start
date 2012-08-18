@@ -15,6 +15,9 @@
 <link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono:700' rel='stylesheet' type='text/css'>
 <link href="assets/style.css" type="text/css" rel="stylesheet"/>
 <!--<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0rc2/jquery.mobile-1.0rc2.min.css" />-->
+
+<script src="phonegap.js"></script>
+<script src="childbrowser.js"></script>
 <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 <script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
 
@@ -120,22 +123,6 @@ $(document).ready(function(){
 		});
 	});
 	
-	$("#getMore").click(function(){
-		var url = 'http://search.twitter.com/search.json';
-		var data = $.parseJSON(localStorage.getItem('queryObj'));
-		//console.log(url.next_page);
-		$.getJSON(url+data.next_page+"&callback=?", null, function (results) {
-			localStorage.setItem('queryObj',JSON.stringify(results));
-			$.each(results.results, function(){
-				var newItem = $("#tweet").clone();
-				newItem.find(".text").html(this.text);
-				newItem.find(".user").html(this.from_user);
-				newItem.find("img").attr("src", this.profile_image_url);
-				newItem.children().appendTo("#mainList");
-				$("#mainList").listview('refresh');
-			});				
-		});
-	});
 	
 	$(".filterLink").click(function(){
 		//$.mobile.showPageLoadingMsg();	
