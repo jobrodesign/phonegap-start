@@ -1,0 +1,73 @@
+/* CSS Document */
+
+#mainList li{
+	padding:0 5px 5px 53px;
+}
+
+#filteredList li{
+	padding:0 5px 5px 53px;
+}
+
+#main h1{
+	font-family: 'Ubuntu Mono', sans-serif;
+	font-size: 2em;
+	padding:0;
+	margin: 0;
+}
+
+.list-divider{
+border: 1px solid black /*{c-bup-border}*/;
+background: #5E5E5E /*{c-bup-background-color}*/;
+font-weight: bold;
+color: white /*{c-bup-color}*/;
+text-shadow: 0 /*{c-bup-shadow-x}*/ 1px /*{c-bup-shadow-y}*/ 1px /*{c-bup-shadow-radius}*/ #343232 /*{c-bup-shadow-color}*/;
+background-image: -webkit-gradient(linear, left top, left bottom, from( #5E5E5E /*{c-bup-background-start}*/), to( #5E5E5E /*{c-bup-background-end}*/));
+background-image: -webkit-linear-gradient(top, #5E5E5E /*{c-bup-background-start}*/, #5E5E5E /*{c-bup-background-end}*/);
+background-image: -moz-linear-gradient(top, #5E5E5E /*{c-bup-background-start}*/, #5E5E5E /*{c-bup-background-end}*/);
+background-image: -ms-linear-gradient(top, #5E5E5E /*{c-bup-background-start}*/, #5E5E5E /*{c-bup-background-end}*/);
+background-image: -o-linear-gradient(top, #5E5E5E /*{c-bup-background-start}*/, #5E5E5E /*{c-bup-background-end}*/);
+background-image: linear-gradient(top, #5E5E5E /*{c-bup-background-start}*/, #5E5E5E /*{c-bup-background-end}*/);
+border-image: initial;
+
+
+}
+
+.ui-li-desc{
+	white-space:normal;
+}
+
+.logo{
+	width:200px;
+	margin:0 auto;
+	border:	2px solid #666;
+}
+
+
+.gridContent{
+	margin:5px;
+}
+
+
+@media screen and (max-width:480px){
+	.phone{
+		display:block;
+	}
+	
+	.logo{
+		display:none;
+	}
+	
+	.tabdesk{
+		display:none;
+	}
+}
+
+@media screen and (min-width:481px){
+	.phone{
+		display:none;
+	}
+	
+	.tabdesk{
+		display:block;
+	}
+}

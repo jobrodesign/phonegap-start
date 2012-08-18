@@ -1,63 +1,201 @@
-<!doctype html>
+<!DOCTYPE html> 
 <html>
-	<head>
-		<meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width" />
-		<title>Training App</title>
-		<link rel="stylesheet" href="assets/css/master.css" type="text/css" media="screen" />
-		
-		<script src="phonegap.js" type="text/javascript" charset="utf-8"></script>
-		
-		<script src="assets/js/xui.js" type="text/javascript" charset="utf-8"></script>
-		
-		<script src="assets/js/lawnchair/adaptors/LawnchairAdaptorHelpers.js" type="text/javascript" charset="utf-8"></script>
-		
-		<script src="assets/js/lawnchair/adaptors/DOMStorageAdaptor.js" type="text/javascript" charset="utf-8"></script>
-		
-		<script src="assets/js/lawnchair/adaptors/WebkitSQLiteAdaptor.js" type="text/javascript" charset="utf-8"></script>
-		
-		<script src="assets/js/lawnchair/Lawnchair.js" type="text/javascript" charset="utf-8"></script>
-		
-		<script src="assets/js/dsl.js" type="text/javascript" charset="utf-8"></script>
-		
-		<script src="assets/js/app.js" type="text/javascript" charset="utf-8"></script>
-		
-	</head>
-	<body>
- 		<div id="title_bar">Phone<strong>Gap</strong> Training App</div>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no, width=device-width"/>
+<link rel="apple-touch-icon" href="tweetgrindr_iphone.png" />
+<link rel="apple-touch-icon" sizes="72x72" href="tweetgrindr_ipad.png" />
+<link rel="apple-touch-icon" sizes="114x114" href="tweetgrindr_iphone4.png" />
 
-		<div id="welcome" class="view">
-		  <div class="app_button" id="map_button">Show My Location</div>
-  	      <div class="app_button" id="settings_button">Settings</div>
+
+<title>HashThrasher</title>
+
+<link rel="stylesheet" href="themes/omglx.min.css">
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile.structure-1.1.1.min.css" />
+<link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono:700' rel='stylesheet' type='text/css'>
+<link href="style.css" type="text/css" rel="stylesheet"/>
+<!--<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0rc2/jquery.mobile-1.0rc2.min.css" />-->
+<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
+
+</head> 
+<body> 
+<div class="templates" style="display:none">
+	<div id="tweet">
+    	<li>
+        	<img src=""/>
+            <h3 class="user"></h3>
+            <p class="text"></p>
+        </li>
+    </div>
+</div>
+<div data-role="page" id="main" data-theme="a">
+	<div data-role="header">
+        	<a href="#menu" data-icon="grid" data-mini="true" class="ui-btn-right" data-iconpos="notext"></a>
+            <h1>Hasher</h1>
+	</div>
+	<div data-role="content">
+    	<!--<ul data-role="listview" id="mainList" data-filter="true" data-theme="a" data-filter-placeholder="#hashtag"></ul>-->
+    	<div data-role="fieldcontain">
+	    	<label for="search-basic" class="ui-hidden-accessible">Search Input:</label>
+			<input type="search" name="search" id="searc-basic" placeholder="#hashtag" data-theme="b" value="" />
+			<a href="#" data-role="button" data-mini="true" data-inline="true" data-theme="b">Bang!</a>
 		</div>
+    	<br style="clear:both;"/>
+        
+        
+    	
+	</div>
+</div>
 
-		<div id="map" class="view">
-		  <div class="map_image">
-              <img id="static_map" src="assets/img/staticmap.png">
-		  </div>
-		  <p>This is where you are</p>
-		  <div class="app_button" id="welcome_button">Go Back</div>
-		</div>
 
-		<div id="settings" class="view">
-		  <form id="settings_form">
-		    <fieldset>
-		      <legend>Map Type</legend>
-			  <input type="radio" name="map" value="roadmap" checked>Road Map<br/>
-		      <input type="radio" name="map" value="satellite">Satellite<br/>
-		      <input type="radio" name="map" value="terrain">Terrain<br/>
-		      <input type="radio" name="map" value="hybrid">Hybrid<br/>
-		    </fieldset>
-		    <fieldset>
-		      <legend>Zoom Level</legend>
-  		      <input type="radio" name="zoom" value="10">Super Far<br/>
-  		      <input type="radio" name="zoom" value="12">Far<br/>
-  		      <input type="radio" name="zoom" value="15" checked>Normal<br/>
-  		      <input type="radio" name="zoom" value="18">Close<br/>
-  		      <input type="radio" name="zoom" value="20">Super Close<br/>
-  		     </fieldset>
-		      <button id="save_button">Save</button>
-	      </form>
-		</div>
 
-	</body>
+
+<div id="settings" data-role="page">
+	<div data-role="header">
+    	<h1>TweetGrindr Settings</h1>
+        <a href="#main" data-icon="home" data-iconpos="notext" class="ui-btn-left">Home</a>
+    </div>
+    <div data-role="content">
+    	<button id="themeswitcher">Theme Switcher</button>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+
+
+$(document).ready(function(){
+	
+	$(".filterLink").each(function(){
+		$(this).prepend("#"+$(this).attr("rel")+" - ");
+	});
+
+	function render(data){
+		//console.log(data);
+		
+		$.each(data, function(){
+			var newItem = $("#tweet").clone();
+			newItem.find(".text").html(this.text);
+			newItem.find(".user").html(this.from_user);
+			newItem.find("img").attr("src", this.profile_image_url);
+			newItem.children().appendTo("#mainList");
+			$("#mainList").listview('refresh');
+		});
+	}
+	
+	function queryHash(hash){
+		//console.log(data);
+		var url = 'http://search.twitter.com/search.json';
+			//console.log(refURL);
+			$.getJSON(url+"q="+hash+"&callback=?", null, function (results) {
+				//console.log(url+refURL+"&callback=?");
+				localStorage.setItem('queryObj',JSON.stringify(results));
+				render(results.results);
+				//console.log(results.results);
+			});
+		}
+	}
+	
+	//init();
+
+	$('body').on()
+	
+	$("#refresh").click(function(e){
+		$("#mainList").html('');
+		e.preventDefault();
+		var url = 'http://search.twitter.com/search.json';
+		var query = '?q=geekend%20%23geekend';
+		$.getJSON(url+query+"&callback=?", null, function (results) {
+			localStorage.setItem('queryObj',JSON.stringify(results));
+			$.each(results.results, function(){
+				var newItem = $("#tweet").clone();
+				newItem.find(".text").html(this.text);
+				newItem.find(".user").html(this.from_user);
+				newItem.find("img").attr("src", this.profile_image_url);
+				newItem.children().appendTo("#mainList");
+				$("#mainList").listview('refresh');
+			});	
+		});
+	});
+	
+	$("#getMore").click(function(){
+		var url = 'http://search.twitter.com/search.json';
+		var data = $.parseJSON(localStorage.getItem('queryObj'));
+		//console.log(url.next_page);
+		$.getJSON(url+data.next_page+"&callback=?", null, function (results) {
+			localStorage.setItem('queryObj',JSON.stringify(results));
+			$.each(results.results, function(){
+				var newItem = $("#tweet").clone();
+				newItem.find(".text").html(this.text);
+				newItem.find(".user").html(this.from_user);
+				newItem.find("img").attr("src", this.profile_image_url);
+				newItem.children().appendTo("#mainList");
+				$("#mainList").listview('refresh');
+			});				
+		});
+	});
+	
+	$(".filterLink").click(function(){
+		//$.mobile.showPageLoadingMsg();	
+		$("#filterTitle").html($(this).html());
+		//$("#filteredList").html('');
+		$("#filteredBtn").attr("rel",$(this).attr("rel"));
+		
+		//Set the rel as the query term and save uri to session storage
+		var query = "#"+$(this).attr("rel");
+		var uri = "http://search.twitter.com/search.json?q="+query+"&callback=?";
+		var url  = encodeURI(uri);
+		url = url.replace(/#/g,"%23");
+		//console.log(url);
+		sessionStorage.filteredQuery = url;
+	});
+	
+	$("#filteredBtn").click(function(e){
+		e.preventDefault();
+		$("#filteredList").html('');
+		alert($(this).atr("rel"));
+		var query = "#"+$(this).attr("rel");
+		var uri = "http://search.twitter.com/search.json?q="+query+"&callback=?";
+		
+		var url  = encodeURI(uri);
+		url = url.replace(/#/g,"%23");
+		//console.log(url);
+		$.getJSON(url, null, function (results) {
+			localStorage.setItem(query,JSON.stringify(results));
+			$.each(results.results, function(){
+				var newItem = $("#tweet").clone();
+				newItem.find(".text").html(this.text);
+				newItem.find(".user").html(this.from_user);
+				newItem.find("img").attr("src", this.profile_image_url);
+				newItem.children().appendTo("#filteredList");
+				$("#filteredList").listview('refresh');
+				//$.mobile.changePage("index.html#filteredPage");
+			});
+		});
+	});
+	
+	$("#getStatus").click(function(){
+		var url = "http://api.twitter.com/1/account/rate_limit_status.json?callback=?";
+		
+		$.getJSON(url, null, function (results) {
+				$("#limit").html('<li>reset time: '+results.reset_time+'</li><li>remaining hits: '+results.remaining_hits+'</li><li>hourly limit: '+results.hourly_limit+'</li>');
+		});
+	});
+	
+	/*$("#login").click(function(){
+		var url = "https://api.twitter.com/oauth/authenticate";
+		
+		$.getJSON(url, null, function (results) {
+				$("#limit").html('<li>reset time: '+results.reset_time+'</li><li>remaining hits: '+results.remaining_hits+'</li><li>hourly limit: '+results.hourly_limit+'</li>');
+		});
+	});*/
+	
+
+	
+});
+</script>
+
+</body>
 </html>
