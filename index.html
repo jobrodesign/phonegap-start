@@ -35,7 +35,7 @@
 </div>
 <div data-role="page" id="main" data-theme="a">
 	<div data-role="header">
-        	<a href="#menu" data-icon="grid" data-mini="true" class="ui-btn-right" data-iconpos="notext"></a>
+        	<a href="#settings" data-icon="grid" data-mini="true" class="ui-btn-right" data-iconpos="notext"></a>
             <h1>Hasher</h1>
 	</div>
 	<div data-role="content">
@@ -199,7 +199,7 @@ $(document).ready(function(){
 
 	$('body').on('click', '#bang', function(e){
 		e.preventDefault();
-		var query = '#'+$("#searc-basic").val();
+		var query = '#'+$("#search-basic").val();
 		var url = "http://search.twitter.com/search.json?q="+query+"&rpp=50&callback=?";
 		oauth.get(url, function(data){console.log($.parseJSON(data)); render(data)}, alert('Query failed'))
 	})
