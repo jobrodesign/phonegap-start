@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="assets/themes/omglx.min.css">
 <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile.structure-1.1.1.min.css" />
-<link href="assets/style.css" type="text/css" rel="stylesheet"/>
+<link href="assets/css/style.css" type="text/css" rel="stylesheet"/>
 <!--<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0rc2/jquery.mobile-1.0rc2.min.css" />-->
 
 <script src="phonegap.js"></script>
@@ -22,9 +22,32 @@
 <script src="assets/js/jsOAuth-1.3.4.min.js"></script>
 <script type="text/javascript">
 
+function render(data){
+		//console.log(data);
+		
+		$.each(data, function(){
+			var newItem = $("#tweet").clone();
+			newItem.find(".text").html(this.text);
+			newItem.find(".user").html(this.from_user);
+			newItem.find("img").attr("src", this.profile_image_url);
+			newItem.children().appendTo("#mainList");
+			$("#mainList").listview('refresh');
+		});
+	}
 
+	function queryHash(hash){
+		//console.log(data);
+		var url = 'http://search.twitter.com/search.json';
+			//console.log(refURL);
+			$.getJSON(url+"q="+hash+"&rpp=50&callback=?", null, function (results) {
+				//console.log(url+refURL+"&callback=?");
+				localStorage.setItem('queryObj',JSON.stringify(results));
+				render(results.results);
+				//console.log(results.results);
+			});
+		}
 
-function getParameterByName(name)
+	function getParameterByName(name)
 {
   name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
   var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -38,9 +61,9 @@ function getParameterByName(name)
 
 
 var options = { 
-	consumerKey: 'bACf9Em0xdeaKMNwuAzfoA',
-	consumerSecret: 'qYCDF8C54CXT285JApaIb2r5dHB8lgKbWUiXtfynfU',
-	callbackUrl: 'http://tweetgrindr.com/'
+    consumerKey: 'bACf9Em0xdeaKMNwuAzfoA',
+    consumerSecret: 'qYCDF8C54CXT285JApaIb2r5dHB8lgKbWUiXtfynfU',
+    callbackUrl: 'http://tweetgrindr.com/'
 };
 
 var oauth = OAuth(options);
@@ -49,95 +72,61 @@ document.addEventListener("deviceready", onDeviceReady, false);
 
 function onDeviceReady(){
 
-	if (typeof window.plugins.childBrowser.onLocationChange !== "function") {
-	    window.plugins.childBrowser.onLocationChange = function(loc){
-	    	console.log(loc);
-	  
-	        // If user hit "No, thanks" when asked to authorize access
-	        if (loc.indexOf("http://tweetgrindr.com/?denied") >= 0) {
-	            $('#oauthStatus').html('<span style="color:red;">User declined access</span>');
-	            window.plugins.childBrowser.close();
-	            return;
-	        }
+    if (typeof window.plugins.childBrowser.onLocationChange !== "function") {
+        window.plugins.childBrowser.onLocationChange = function(loc){
+            console.log(loc);
+      
+            // If user hit "No, thanks" when asked to authorize access
+            if (loc.indexOf("http://tweetgrindr.com/?denied") >= 0) {
+                $('#oauthStatus').html('<span style="color:red;">User declined access</span>');
+                window.plugins.childBrowser.close();
+                return;
+            }
 
-	       // Same as above, but user went to app's homepage instead
-	       // of back to app. Don't close the browser in this case.
-	       if (loc === "http://tweetgrindr.com") {
-	            $('#oauthStatus').html('<span style="color:red;">User declined access</span>');
-	                return;
-	       }
+           // Same as above, but user went to app's homepage instead
+           // of back to app. Don't close the browser in this case.
+           if (loc === "http://tweetgrindr.com") {
+                $('#oauthStatus').html('<span style="color:red;">User declined access</span>');
+                    return;
+           }
 
-	       // The supplied oauth_callback_url for this session is being loaded
-			if (loc.indexOf("http://tweetgrindr.com/?") >= 0) {
-	     	// EXTRACT VERIFIER
-	     	var verifier = getParameterByName('verifier');
-	     	// Exchange request token for access token 
-	     	oauth.get('https://api.twitter.com/oauth/access_token?oauth_verifier='+verifier+'&'+requestParams, 
-	     	function(data){
-		        // SUCCESS HANDLER: EXTRACT ACCESS TOKEN KEY and SECRET
-		        // SAVE TOKEN KEY/SECRET in oauth obj 
-		        console.log(data.text);
-		        var temp = data.text.split('&');
-		        var tempAuth = {};
-				for (i=0; i < temp.length; i++){
-					var t = temp[i].split('=');
-					console.log(t);
-					tempAuth[t[0]] = t[1];
-				}
-	          	oauth.setAccessToken(tempAuth.oauth_token, tempAuth.oauth_token_secret);
-		        // SAVE TOKEN KEY/SECRET in localStorage
-		        localStorage.setItem('storedToken', tempAuth.oauth_token);
-		        localStorage.setItem('storedTokenSecret', tempAuth.oauth_token_secret);
-		        // CALL oauth.get() TO GET USER'S screen_name 
-		        window.plugins.childBrowser.close();
-	     	},
-	     	function(msg){
-	          // FAIL HANDLER: REPORT FAILURE,
-	     	});
-	     }
-	}
-	};
+           // The supplied oauth_callback_url for this session is being loaded
+            if (loc.indexOf("http://tweetgrindr.com/?") >= 0) {
+            // EXTRACT VERIFIER
+            var verifier = getParameterByName('verifier');
+            // Exchange request token for access token 
+            oauth.get('https://api.twitter.com/oauth/access_token?oauth_verifier='+verifier+'&'+requestParams, 
+            function(data){
+                // SUCCESS HANDLER: EXTRACT ACCESS TOKEN KEY and SECRET
+                // SAVE TOKEN KEY/SECRET in oauth obj 
+                console.log(data.text);
+                var temp = data.text.split('&');
+                var tempAuth = {};
+                for (i=0; i < temp.length; i++){
+                    var t = temp[i].split('=');
+                    console.log(t);
+                    tempAuth[t[0]] = t[1];
+                }
+                oauth.setAccessToken(tempAuth.oauth_token, tempAuth.oauth_token_secret);
+                // SAVE TOKEN KEY/SECRET in localStorage
+                localStorage.setItem('storedToken', tempAuth.oauth_token);
+                localStorage.setItem('storedTokenSecret', tempAuth.oauth_token_secret);
+                // CALL oauth.get() TO GET USER'S screen_name 
+                window.plugins.childBrowser.close();
+            },
+            function(msg){
+              // FAIL HANDLER: REPORT FAILURE,
+            });
+         }
+    }
+    };
 
 }
-
-
-
-
-
-
-
+	
 
 
 $(document).ready(function(){
 
-
-	function render(data){
-		//console.log(data);
-		
-		$.each(data, function(){
-			var newItem = $("#tweet").clone();
-			newItem.find(".text").html(this.text);
-			newItem.find(".user").html(this.from_user);
-			newItem.find("img").attr("src", this.profile_image_url);
-			newItem.children().appendTo("#mainList");
-			$("#mainList").listview('refresh');
-		});
-	}
-	
-	function queryHash(hash){
-		//console.log(data);
-		var url = 'http://search.twitter.com/search.json';
-			//console.log(refURL);
-			$.getJSON(url+"q="+hash+"&rpp=50&callback=?", null, function (results) {
-				//console.log(url+refURL+"&callback=?");
-				localStorage.setItem('queryObj',JSON.stringify(results));
-				render(results.results);
-				//console.log(results.results);
-			});
-		}
-	}
-	
-	//init();
 
 	$('body').on('click', '#authorize', function(e){
 		e.preventDefault();
