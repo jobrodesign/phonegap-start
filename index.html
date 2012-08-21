@@ -25,7 +25,7 @@
 function render(data){
 		//console.log(data);
 		
-		$.each(data, function(){
+		$.each(data.results, function(){
 			var newItem = $("#tweet").clone();
 			newItem.find(".text").html(this.text);
 			newItem.find(".user").html(this.from_user);
@@ -147,8 +147,19 @@ $(document).ready(function(){
 	$('body').on('click', '#bang', function(e){
 		e.preventDefault();
 		var query = '#'+$("#search-basic").val();
-		var url = "http://search.twitter.com/search.json?q="+query+"&rpp=50&callback=?";
-		oauth.get(url, function(data){console.log($.parseJSON(data)); render(data)}, alert('Query failed'))
+		var uri = "http://search.twitter.com/search.json?q="+query+"&rpp=50&callback=?";
+		var url = encodeURI(uri);
+		url = url.replace(/#/g,"%23");
+		$.getJSON(url, function(data){
+			console.log($.parseJSON(data)); 
+			render(data.results)
+		}, alert('Query failed'))
+	})
+
+	$('body').on('click', '#clear', function(e){
+		e.preventDefault();
+		$('#mainList').html('');
+		$('#search-basic').val('');
 	})
 
 	
@@ -179,6 +190,7 @@ $(document).ready(function(){
 	    	<label for="search-basic" class="ui-hidden-accessible">Search Input:</label>
 			<input type="search" name="search" id="search-basic" placeholder="#hashtag" data-theme="b" value="" />
 			<a id="bang" href="#" data-role="button" data-mini="true" data-inline="true" data-theme="b">Bang!</a>
+			<a id="clear" href="#" data-role="button" data-mini="true" data-inline="true" data-theme="b">Clear</a>
 		</div>
     	<br style="clear:both;"/>
     	<ul id="mainList" data-role="listview"></ul>
