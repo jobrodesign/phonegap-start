@@ -20,7 +20,7 @@
 <script src="childbrowser.js"></script>
 <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 <script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
-<script src="assets/js/jsOAuth-1.3.4.min.js"></script>
+<script src="jsOAuth-1.3.4.min.js"></script>
 
 </head> 
 <body> 
@@ -42,10 +42,11 @@
     	<!--<ul data-role="listview" id="mainList" data-filter="true" data-theme="a" data-filter-placeholder="#hashtag"></ul>-->
     	<div data-role="fieldcontain">
 	    	<label for="search-basic" class="ui-hidden-accessible">Search Input:</label>
-			<input type="search" name="search" id="searc-basic" placeholder="#hashtag" data-theme="b" value="" />
-			<a href="#" data-role="button" data-mini="true" data-inline="true" data-theme="b">Bang!</a>
+			<input type="search" name="search" id="search-basic" placeholder="#hashtag" data-theme="b" value="" />
+			<a id="bang" href="#" data-role="button" data-mini="true" data-inline="true" data-theme="b">Bang!</a>
 		</div>
     	<br style="clear:both;"/>
+    	<ul id="mainList" data-role="listview"></ul>
         
         
     	
@@ -61,12 +62,86 @@
         <a href="#main" data-icon="home" data-iconpos="notext" class="ui-btn-left">Home</a>
     </div>
     <div data-role="content">
-    	<button id="themeswitcher">Theme Switcher</button>
+    	<button id="authorize">Authorize App</button>
     </div>
 </div>
 
 
 <script type="text/javascript">
+
+function getParameterByName(name)
+{
+  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+  var regexS = "[\\?&]" + name + "=([^&#]*)";
+  var regex = new RegExp(regexS);
+  var results = regex.exec(window.location.search);
+  if(results == null)
+    return "";
+  else
+    return decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+
+var options = { 
+	consumerKey: 'bACf9Em0xdeaKMNwuAzfoA',
+	consumerSecret: 'qYCDF8C54CXT285JApaIb2r5dHB8lgKbWUiXtfynfU',
+	callbackUrl: 'http://tweetgrindr.com/'
+};
+
+var oauth = OAuth(options);
+
+if (typeof window.plugins.childBrowser.onLocationChange !== "function") {
+    window.plugins.childBrowser.onLocationChange = function(loc){
+    	console.log(loc);
+  
+        // If user hit "No, thanks" when asked to authorize access
+        if (loc.indexOf("http://tweetgrindr.com/?denied") >= 0) {
+            $('#oauthStatus').html('<span style="color:red;">User declined access</span>');
+            window.plugins.childBrowser.close();
+            return;
+        }
+
+       // Same as above, but user went to app's homepage instead
+       // of back to app. Don't close the browser in this case.
+       if (loc === "http://tweetgrindr.com") {
+            $('#oauthStatus').html('<span style="color:red;">User declined access</span>');
+                return;
+       }
+
+       // The supplied oauth_callback_url for this session is being loaded
+		if (loc.indexOf("http://tweetgrindr.com/?") >= 0) {
+     	// EXTRACT VERIFIER
+     	var verifier = getParameterByName('verifier');
+     	// Exchange request token for access token 
+     	oauth.get('https://api.twitter.com/oauth/access_token?oauth_verifier='+verifier+'&'+requestParams, 
+     	function(data){
+	        // SUCCESS HANDLER: EXTRACT ACCESS TOKEN KEY and SECRET
+	        // SAVE TOKEN KEY/SECRET in oauth obj 
+	        console.log(data.text);
+	        var temp = data.text.split('&');
+	        var tempAuth = {};
+			for (i=0; i < temp.length; i++){
+				var t = temp[i].split('=');
+				console.log(t);
+				tempAuth[t[0]] = t[1];
+			}
+          	oauth.setAccessToken(tempAuth.oauth_token, tempAuth.oauth_token_secret);
+	        // SAVE TOKEN KEY/SECRET in localStorage
+	        localStorage.setItem('storedToken', tempAuth.oauth_token);
+	        localStorage.setItem('storedTokenSecret', tempAuth.oauth_token_secret);
+	        // CALL oauth.get() TO GET USER'S screen_name 
+	        window.plugins.childBrowser.close();
+     	},
+     	function(msg){
+          // FAIL HANDLER: REPORT FAILURE,
+     	});
+     }
+}
+};
+
+
+
+
 
 
 
@@ -93,7 +168,7 @@ $(document).ready(function(){
 		//console.log(data);
 		var url = 'http://search.twitter.com/search.json';
 			//console.log(refURL);
-			$.getJSON(url+"q="+hash+"&callback=?", null, function (results) {
+			$.getJSON(url+"q="+hash+"&rpp=50&callback=?", null, function (results) {
 				//console.log(url+refURL+"&callback=?");
 				localStorage.setItem('queryObj',JSON.stringify(results));
 				render(results.results);
@@ -104,65 +179,35 @@ $(document).ready(function(){
 	
 	//init();
 
-	$('body').on()
-	
-	$("#refresh").click(function(e){
-		$("#mainList").html('');
+	$('body').on('click', '#authorize', function(e){
 		e.preventDefault();
-		var url = 'http://search.twitter.com/search.json';
-		var query = '?q=geekend%20%23geekend';
-		$.getJSON(url+query+"&callback=?", null, function (results) {
-			localStorage.setItem('queryObj',JSON.stringify(results));
-			$.each(results.results, function(){
-				var newItem = $("#tweet").clone();
-				newItem.find(".text").html(this.text);
-				newItem.find(".user").html(this.from_user);
-				newItem.find("img").attr("src", this.profile_image_url);
-				newItem.children().appendTo("#mainList");
-				$("#mainList").listview('refresh');
-			});	
-		});
+		oauth.get('https://api.twitter.com/oauth/request_token',
+		    function(data) {
+		        requestParams = data.text;
+		        $('#oauthStatus').html('<span style="color:blue;">Getting authorization...</span>');
+		        window.plugins.childBrowser.showWebPage('https://api.twitter.com/oauth/authorize?'+data.text, 
+		                { showLocationBar : false });                    
+		    },
+		    function(data) { 
+		        alert('Error : No Authorization'); 
+		        $('#oauthStatus').html('<span style="color:red;">Error during authorization</span>');
+		    }
+		);
 	});
 	
-	
-	$(".filterLink").click(function(){
-		//$.mobile.showPageLoadingMsg();	
-		$("#filterTitle").html($(this).html());
-		//$("#filteredList").html('');
-		$("#filteredBtn").attr("rel",$(this).attr("rel"));
-		
-		//Set the rel as the query term and save uri to session storage
-		var query = "#"+$(this).attr("rel");
-		var uri = "http://search.twitter.com/search.json?q="+query+"&callback=?";
-		var url  = encodeURI(uri);
-		url = url.replace(/#/g,"%23");
-		//console.log(url);
-		sessionStorage.filteredQuery = url;
-	});
-	
-	$("#filteredBtn").click(function(e){
+
+
+	$('body').on('click', '#bang', function(e){
 		e.preventDefault();
-		$("#filteredList").html('');
-		alert($(this).atr("rel"));
-		var query = "#"+$(this).attr("rel");
-		var uri = "http://search.twitter.com/search.json?q="+query+"&callback=?";
-		
-		var url  = encodeURI(uri);
-		url = url.replace(/#/g,"%23");
-		//console.log(url);
-		$.getJSON(url, null, function (results) {
-			localStorage.setItem(query,JSON.stringify(results));
-			$.each(results.results, function(){
-				var newItem = $("#tweet").clone();
-				newItem.find(".text").html(this.text);
-				newItem.find(".user").html(this.from_user);
-				newItem.find("img").attr("src", this.profile_image_url);
-				newItem.children().appendTo("#filteredList");
-				$("#filteredList").listview('refresh');
-				//$.mobile.changePage("index.html#filteredPage");
-			});
-		});
-	});
+		var query = '#'+$("#searc-basic").val();
+		var url = "http://search.twitter.com/search.json?q="+query+"&rpp=50&callback=?";
+		oauth.get(url, function(data){console.log($.parseJSON(data)); render(data)}, alert('Query failed'))
+	})
+	
+	
+
+	
+
 	
 	$("#getStatus").click(function(){
 		var url = "http://api.twitter.com/1/account/rate_limit_status.json?callback=?";
