@@ -21,52 +21,6 @@
 <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 <script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
 <script src="assets/js/jsOAuth-1.3.4.min.js"></script>
-
-</head> 
-<body> 
-<div class="templates" style="display:none">
-	<div id="tweet">
-    	<li>
-        	<img src=""/>
-            <h3 class="user"></h3>
-            <p class="text"></p>
-        </li>
-    </div>
-</div>
-<div data-role="page" id="main" data-theme="a">
-	<div data-role="header">
-        	<a href="#settings" data-icon="grid" data-mini="true" class="ui-btn-right" data-iconpos="notext"></a>
-            <h1>Hasher</h1>
-	</div>
-	<div data-role="content">
-    	<!--<ul data-role="listview" id="mainList" data-filter="true" data-theme="a" data-filter-placeholder="#hashtag"></ul>-->
-    	<div data-role="fieldcontain">
-	    	<label for="search-basic" class="ui-hidden-accessible">Search Input:</label>
-			<input type="search" name="search" id="search-basic" placeholder="#hashtag" data-theme="b" value="" />
-			<a id="bang" href="#" data-role="button" data-mini="true" data-inline="true" data-theme="b">Bang!</a>
-		</div>
-    	<br style="clear:both;"/>
-    	<ul id="mainList" data-role="listview"></ul>
-        
-        
-    	
-	</div>
-</div>
-
-
-
-
-<div id="settings" data-role="page">
-	<div data-role="header">
-    	<h1>TweetGrindr Settings</h1>
-        <a href="#main" data-icon="home" data-iconpos="notext" class="ui-btn-left">Home</a>
-    </div>
-    <div data-role="content">
-    	<button id="authorize">Authorize App</button>
-    </div>
-</div>
-
-
 <script type="text/javascript">
 
 function getParameterByName(name)
@@ -229,6 +183,53 @@ $(document).ready(function(){
 	
 });
 </script>
+
+</head> 
+<body> 
+<div class="templates" style="display:none">
+	<div id="tweet">
+    	<li>
+        	<img src=""/>
+            <h3 class="user"></h3>
+            <p class="text"></p>
+        </li>
+    </div>
+</div>
+<div data-role="page" id="main" data-theme="a">
+	<div data-role="header">
+        	<a href="#settings" data-icon="grid" data-mini="true" class="ui-btn-right" data-iconpos="notext"></a>
+            <h1>Hasher</h1>
+	</div>
+	<div data-role="content">
+    	<!--<ul data-role="listview" id="mainList" data-filter="true" data-theme="a" data-filter-placeholder="#hashtag"></ul>-->
+    	<div data-role="fieldcontain">
+	    	<label for="search-basic" class="ui-hidden-accessible">Search Input:</label>
+			<input type="search" name="search" id="search-basic" placeholder="#hashtag" data-theme="b" value="" />
+			<a id="bang" href="#" data-role="button" data-mini="true" data-inline="true" data-theme="b">Bang!</a>
+		</div>
+    	<br style="clear:both;"/>
+    	<ul id="mainList" data-role="listview"></ul>
+        
+        
+    	
+	</div>
+</div>
+
+
+
+
+<div id="settings" data-role="page">
+	<div data-role="header">
+    	<h1>TweetGrindr Settings</h1>
+        <a href="#main" data-icon="home" data-iconpos="notext" class="ui-btn-left">Home</a>
+    </div>
+    <div data-role="content">
+    	<button id="authorize">Authorize App</button>
+    </div>
+</div>
+
+
+
 
 </body>
 </html>
