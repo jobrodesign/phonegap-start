@@ -147,13 +147,15 @@ $(document).ready(function(){
 	$('body').on('click', '#bang', function(e){
 		e.preventDefault();
 		var query = '#'+$("#search-basic").val();
-		var uri = "http://search.twitter.com/search.json?q="+query+"&rpp=50&callback=?";
+		var uri = "https://search.twitter.com/search.json?q="+query+"&rpp=50&callback=?";
 		var url = encodeURI(uri);
 		url = url.replace(/#/g,"%23");
+		//console.log(url)
 		$.getJSON(url, function(data){
-			console.log($.parseJSON(data)); 
-			render(data.results)
-		}, alert('Query failed'))
+			//console.log($.parseJSON(data)); 
+			render(data)
+		})
+
 	})
 
 	$('body').on('click', '#clear', function(e){
