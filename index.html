@@ -10,10 +10,10 @@
 
 <title>HashThrasher</title>
 
-<link rel="stylesheet" href="assets/themes/omglx.min.css">
-<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile.structure-1.1.1.min.css" />
+<!--<link rel="stylesheet" href="assets/themes/omglx.min.css">
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile.structure-1.1.1.min.css" />-->
 <link href="assets/css/style.css" type="text/css" rel="stylesheet"/>
-<!--<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0rc2/jquery.mobile-1.0rc2.min.css" />-->
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.css" />
 
 <script src="phonegap.js"></script>
 <script src="childbrowser.js"></script>
@@ -67,6 +67,10 @@ var options = {
 };
 
 var oauth = OAuth(options);
+
+if(localStorage.getItem('storedToken')){
+    oauth.setAccessToken(localStorage.getItem('storedToken'), localStorage.getItem('storedTokenSecret'));
+}
 
 document.addEventListener("deviceready", onDeviceReady, false);
 
@@ -146,6 +150,8 @@ $(document).ready(function(){
 	
 	$('body').on('click', '#bang', function(e){
 		e.preventDefault();
+        $.mobile.showPageLoadingMsg();
+        $('#mainList').empty();
 		var query = '#'+$("#search-basic").val();
 		var uri = "https://search.twitter.com/search.json?q="+query+"&rpp=50&callback=?";
 		var url = encodeURI(uri);
@@ -153,15 +159,18 @@ $(document).ready(function(){
 		//console.log(url)
 		$.getJSON(url, function(data){
 			//console.log($.parseJSON(data)); 
-			render(data)
+			render(data);
+            $.mobile.hidePageLoadingMsg();
 		})
 
 	})
 
-	$('body').on('click', '#clear', function(e){
+	$('body').on('click', '#save', function(e){
 		e.preventDefault();
-		$('#mainList').html('');
-		$('#search-basic').val('');
+		var hash = $('#search-basic').val();
+        $('[data-tmpl="hash"]').empty().append('#'+hash);
+        //$.mobile.changePage('#saveHash');
+        $.mobile.changePage( "#saveHash", { transition: "pop"} )
 	})
 
 	
@@ -172,17 +181,9 @@ $(document).ready(function(){
 
 </head> 
 <body> 
-<div class="templates" style="display:none">
-	<div id="tweet">
-    	<li>
-        	<img src=""/>
-            <h3 class="user"></h3>
-            <p class="text"></p>
-        </li>
-    </div>
-</div>
+
 <div data-role="page" id="main" data-theme="a">
-	<div data-role="header">
+	<div data-role="header" data-position="fixed" data-tap-toggle="false">
         	<a href="#settings" data-icon="grid" data-mini="true" class="ui-btn-right" data-iconpos="notext"></a>
             <h1>Hasher</h1>
 	</div>
@@ -192,14 +193,30 @@ $(document).ready(function(){
 	    	<label for="search-basic" class="ui-hidden-accessible">Search Input:</label>
 			<input type="search" name="search" id="search-basic" placeholder="#hashtag" data-theme="b" value="" />
 			<a id="bang" href="#" data-role="button" data-mini="true" data-inline="true" data-theme="b">Bang!</a>
-			<a id="clear" href="#" data-role="button" data-mini="true" data-inline="true" data-theme="b">Clear</a>
+			<a id="save" href="#" data-role="button" data-mini="true" data-inline="true" data-theme="b">Save</a>        
 		</div>
     	<br style="clear:both;"/>
     	<ul id="mainList" data-role="listview"></ul>
-        
-        
-    	
 	</div>
+    <div data-role="footer" data-position="fixed" data-tap-toggle="false">
+        <div data-role="navbar">
+            <ul>
+                <li><a href="#main" data-icon="home">Home</a></li>
+                <li><a href="#" data-icon="home">Hashes</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div id="saveHash" data-role="dialog" data-theme="a">
+    <div data-role="header">
+        <h1>Save Hash</h1>
+    </div>
+    <div data-role="content">
+        <span data-tmpl="hash" class="hash"></span>
+            <input type="text" data-mini="true" placeholder="Title"/>
+            <textarea data-mini="true" placeholder="Description"></textarea>
+    </div>
 </div>
 
 
@@ -207,12 +224,27 @@ $(document).ready(function(){
 
 <div id="settings" data-role="page">
 	<div data-role="header">
-    	<h1>TweetGrindr Settings</h1>
-        <a href="#main" data-icon="home" data-iconpos="notext" class="ui-btn-left">Home</a>
+        <a href="#main" data-icon="home" data-mini="true" class="ui-btn-left" data-iconpos="notext"></a>
+        <h1>Hasher</h1>
     </div>
     <div data-role="content">
     	<button id="authorize">Authorize App</button>
     </div>
+</div>
+
+
+
+<div class="templates" style="display:none">
+    <div id="tweet">
+        <li>
+            <img src=""/>
+            <h3 class="user"></h3>
+            <p class="text"></p>
+        </li>
+    </div>
+
+    
+
 </div>
 
 
